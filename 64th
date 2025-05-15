@@ -1,32 +1,33 @@
 local screenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 screenGui.Name = "screenGui"
 
--- Water ImageButton
+-- Lua-themed button (dark blue/purple like Lua syntax)
 local btn = Instance.new("ImageButton", screenGui)
-btn.Name = "WaterSpeedBtn"
-btn.Image = "rbxassetid://13129884510" -- Water texture (replace if needed)
-btn.ImageTransparency = 0.3
+btn.Name = "LuaSpeedBtn"
+btn.Image = "rbxassetid://13129884510" -- Optional: Keep water texture or set to ""
+btn.ImageTransparency = 0.9 -- Mostly transparent to show background color
 btn.Size = UDim2.new(0, 100, 0, 40)
 btn.Position = UDim2.new(0, 30, 0, 30)
-btn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
-btn.BackgroundTransparency = 0
+btn.BackgroundColor3 = Color3.fromRGB(40, 40, 120) -- Dark Lua blue
+btn.BackgroundTransparency = 0.2 -- Slightly transparent
 btn.Active = true
 btn.Draggable = true
 
--- Add TextLabel inside the ImageButton
+-- TextLabel for speed display (Lua-style bright text)
 local speedText = Instance.new("TextLabel", btn)
 speedText.Name = "SpeedText"
-speedText.Size = UDim2.new(1, 0, 1, 0) -- Fills entire button
-speedText.BackgroundTransparency = 1 -- Invisible background
+speedText.Size = UDim2.new(1, 0, 1, 0)
+speedText.BackgroundTransparency = 1
 speedText.Text = "Speed: 16"
-speedText.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedText.TextColor3 = Color3.fromRGB(200, 200, 255) -- Light blue (Lua text color)
 speedText.Font = Enum.Font.GothamBlack
 speedText.TextScaled = true
 
+-- Rounded corners
 local uibtn = Instance.new("UICorner", btn)
 uibtn.CornerRadius = UDim.new(0, 10)
 
--- Rest of the script remains the same
+-- === SPEED HACK LOGIC (UNCHANGED) === --
 local gmt = getrawmetatable(game)
 setreadonly(gmt, false)
 
@@ -40,7 +41,6 @@ end)
 
 print("Metatable hooked.")
 
--- Character handling
 local Players = game:GetService("Players")
 local lp = Players.LocalPlayer
 
@@ -50,7 +50,7 @@ local fast = false
 local function updateSpeed()
     if humanoid then
         humanoid.WalkSpeed = fast and 100 or 16
-        speedText.Text = fast and "Speed: 100" or "Speed: 16" -- Update TextLabel now
+        speedText.Text = fast and "Speed: 100" or "Speed: 16"
     end
 end
 
@@ -68,9 +68,7 @@ end
 lp.CharacterAdded:Connect(setupCharacter)
 if lp.Character then setupCharacter(lp.Character) end
 
--- Toggle speed on click
 btn.MouseButton1Click:Connect(function()
     fast = not fast
     updateSpeed()
 end)
-
