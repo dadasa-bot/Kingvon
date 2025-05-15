@@ -9,7 +9,7 @@ btn.ImageTransparency = 0.3
 btn.Size = UDim2.new(0, 100, 0, 40)
 btn.Position = UDim2.new(0, 30, 0, 30)
 btn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
-btn.BackgroundTransparency = 0.7
+btn.BackgroundTransparency = 0
 btn.Active = true
 btn.Draggable = true
 
