@@ -1,19 +1,23 @@
 local screenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 screenGui.Name = "screenGui"
 
-local btn = Instance.new("TextButton", screenGui)
-btn.Name = "btn"
-btn.Text = "Speed: 16"
+-- Water ImageButton (using a free water texture from online)
+local btn = Instance.new("ImageButton", screenGui)
+btn.Name = "WaterSpeedBtn"
+btn.Image = "rbxassetid://13129884510" -- Water texture (replace with your preferred image ID)
+btn.ImageTransparency = 0.3
 btn.Size = UDim2.new(0, 100, 0, 40)
 btn.Position = UDim2.new(0, 30, 0, 30)
-btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Missing RGB values
-btn.TextColor3 = Color3.fromRGB(255, 255, 255) -- Missing RGB values
+btn.BackgroundColor3 = Color3.fromRGB(0, 100, 255) -- Water blue
+btn.BackgroundTransparency = 0.7
+btn.Text = "Speed: 16"
+btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 btn.Font = Enum.Font.GothamBlack
-btn.Active = true 
+btn.Active = true
 btn.Draggable = true
 
 local uibtn = Instance.new("UICorner", btn)
-uibtn.CornerRadius = UDim.new(0, 10) -- Fixed: Applied to UICorner, not btn
+uibtn.CornerRadius = UDim.new(0, 10)
 
 -- Metatable hook
 local gmt = getrawmetatable(game)
@@ -22,19 +26,19 @@ setreadonly(gmt, false)
 local oldIndex = gmt.__index
 gmt.__index = newcclosure(function(self, key)
     if tostring(self) == "Humanoid" and key == "WalkSpeed" then
-        return 20 -- Fake value (scripts will read 20, but real speed is 100)
+        return 20 -- Fake value
     end
     return oldIndex(self, key)
 end)
 
 print("Metatable hooked.")
 
--- Get Humanoid safely (handles respawns)
+-- Character handling
 local Players = game:GetService("Players")
 local lp = Players.LocalPlayer
 
 local humanoid
-local fast = false -- Toggle state
+local fast = false
 
 local function updateSpeed()
     if humanoid then
@@ -47,7 +51,6 @@ local function setupCharacter(char)
     humanoid = char:WaitForChild("Humanoid")
     updateSpeed()
     
-    -- Auto-reset if another script changes WalkSpeed
     humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
         if humanoid.WalkSpeed ~= (fast and 100 or 16) then
             updateSpeed()
