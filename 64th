@@ -1,0 +1,51 @@
+-- Metatable override
+local gmt = getrawmetatable(game)
+setreadonly(gmt, false)
+
+local OldIndex = gmt.__index
+gmt.__index = newcclosure(function(self, k)
+    if tostring(self) == "Humanoid" and k == "WalkSpeed" then
+        return 20 -- Fake value to scripts reading it
+    end
+    return OldIndex(self, k)
+end)
+
+print("Metatable hooked.")
+
+-- Get LocalPlayer and wait for Humanoid
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+
+local function getHumanoid()
+    local char = lp.Character or lp.CharacterAdded:Wait()
+    return char:WaitForChild("Humanoid")
+end
+
+local humanoid = getHumanoid()
+
+-- Create Button GUI
+local ScreenGui = Instance.new("ScreenGui", lp:WaitForChild("PlayerGui"))
+ScreenGui.ResetOnSpawn = false
+
+local Button = Instance.new("TextButton", ScreenGui)
+Button.Size = UDim2.new(0, 120, 0, 40)
+Button.Position = UDim2.new(0, 30, 30, 0)
+Button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.Text = "Speed: 16"
+Button.Font = Enum.Font.SourceSansBold
+Button.TextSize = 20
+
+-- Toggle WalkSpeed
+local fast = false
+
+Button.MouseButton1Click:Connect(function()
+    fast = not fast
+    if fast then
+        humanoid.WalkSpeed = 100
+        Button.Text = "Speed: 100"
+    else
+        humanoid.WalkSpeed = 16
+        Button.Text = "Speed: 16"
+    end
+end)
