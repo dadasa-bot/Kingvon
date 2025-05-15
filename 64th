@@ -1,54 +1,65 @@
-local Players = game:GetService("Players")
-local lp = Players.LocalPlayer
-local CoreGui = game:GetService("CoreGui")
+local screenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+screenGui.Name = "screenGui"
 
-local ScreenGui = Instance.new("ScreenGui", CoreGui)
-ScreenGui.Name = "Screengui"
+local btn = Instance.new("TextButton", screenGui)
+btn.Name = "btn"
+btn.Text = "Speed: 16"
+btn.Size = UDim2.new(0, 100, 0, 40)
+btn.Position = UDim2.new(0, 30, 0, 30)
+btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Missing RGB values
+btn.TextColor3 = Color3.fromRGB(255, 255, 255) -- Missing RGB values
+btn.Font = Enum.Font.GothamBlack
+btn.Active = true 
+btn.Draggable = true
 
-local Button = Instance.new("TextButton", Screengui)
-Button.Size = UDim2.new(0, 120, 0, 40)
-Button.Position = UDim2.new(0.5, -60, 0.9, 0)
-Button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-Button.Text = "Speed: 16"
-Button.Font = Enum.Font.SourceSansBold
-Button.TextScaled = true
+local uibtn = Instance.new("UICorner", btn)
+uibtn.CornerRadius = UDim.new(0, 10) -- Fixed: Applied to UICorner, not btn
 
-local uibtn = Instance.new("UICorner", Button)
-uibtn.CornerRadius = UDim.new(0, 10)
-
--- Metatable override
+-- Metatable hook
 local gmt = getrawmetatable(game)
-local OldIndex = gmt.__index
 setreadonly(gmt, false)
 
-gmt.__index = newcclosure(function(self, k)
-    if tostring(self) == "Humanoid" and k == "WalkSpeed" then
-        return 20 -- Fake value to scripts reading it
+local oldIndex = gmt.__index
+gmt.__index = newcclosure(function(self, key)
+    if tostring(self) == "Humanoid" and key == "WalkSpeed" then
+        return 20 -- Fake value (scripts will read 20, but real speed is 100)
     end
-    return OldIndex(self, k)
+    return oldIndex(self, key)
 end)
 
 print("Metatable hooked.")
 
--- Handle character changes
+-- Get Humanoid safely (handles respawns)
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+
 local humanoid
-local fast = false
+local fast = false -- Toggle state
+
+local function updateSpeed()
+    if humanoid then
+        humanoid.WalkSpeed = fast and 100 or 16
+        btn.Text = fast and "Speed: 100" or "Speed: 16"
+    end
+end
 
 local function setupCharacter(char)
     humanoid = char:WaitForChild("Humanoid")
-    humanoid.WalkSpeed = fast and 100 or 16
+    updateSpeed()
+    
+    -- Auto-reset if another script changes WalkSpeed
+    humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+        if humanoid.WalkSpeed ~= (fast and 100 or 16) then
+            updateSpeed()
+        end
+    end)
 end
 
 lp.CharacterAdded:Connect(setupCharacter)
-if lp.Character then
-    setupCharacter(lp.Character)
-end
+if lp.Character then setupCharacter(lp.Character) end
 
-Button.MouseButton1Click:Connect(function()
+-- Toggle speed on click
+btn.MouseButton1Click:Connect(function()
     fast = not fast
-    if humanoid then
-        humanoid.WalkSpeed = fast and 100 or 16
-        Button.Text = "Speed: " .. (fast and "100" or "16")
-    end
+    updateSpeed()
 end)
