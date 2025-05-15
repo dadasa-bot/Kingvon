@@ -1,4 +1,4 @@
-local ScreenGui = Instance.new("ScreenGui", lp:WaitForChild("PlayerGui"))
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
 ScreenGui.Name = "screenGui"
 
 local Button = Instance.new("TextButton", ScreenGui)
