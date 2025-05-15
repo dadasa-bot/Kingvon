@@ -1,7 +1,11 @@
-local ScreenGui = Instance.new("ScreenGui", CoreGui)
-ScreenGui.Name = "screenGui"
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+local CoreGui = game:GetService("CoreGui")
 
-local Button = Instance.new("TextButton", ScreenGui)
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
+ScreenGui.Name = "Screengui"
+
+local Button = Instance.new("TextButton", Screengui)
 Button.Size = UDim2.new(0, 120, 0, 40)
 Button.Position = UDim2.new(0.5, -60, 0.9, 0)
 Button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
@@ -15,9 +19,9 @@ uibtn.CornerRadius = UDim.new(0, 10)
 
 -- Metatable override
 local gmt = getrawmetatable(game)
+local OldIndex = gmt.__index
 setreadonly(gmt, false)
 
-local OldIndex = gmt.__index
 gmt.__index = newcclosure(function(self, k)
     if tostring(self) == "Humanoid" and k == "WalkSpeed" then
         return 20 -- Fake value to scripts reading it
@@ -27,27 +31,24 @@ end)
 
 print("Metatable hooked.")
 
--- Get LocalPlayer and wait for Humanoid
-local Players = game:GetService("Players")
-local lp = Players.LocalPlayer
+-- Handle character changes
+local humanoid
+local fast = false
 
-local function getHumanoid()
-    local char = lp.Character or lp.CharacterAdded:Wait()
-    return char:WaitForChild("Humanoid")
+local function setupCharacter(char)
+    humanoid = char:WaitForChild("Humanoid")
+    humanoid.WalkSpeed = fast and 100 or 16
 end
 
-local humanoid = getHumanoid()
-
--- Toggle WalkSpeed
-local fast = false
+lp.CharacterAdded:Connect(setupCharacter)
+if lp.Character then
+    setupCharacter(lp.Character)
+end
 
 Button.MouseButton1Click:Connect(function()
     fast = not fast
-    if fast then
-        humanoid.WalkSpeed = 100
-        Button.Text = "Speed: 100"
-    else
-        humanoid.WalkSpeed = 16
-        Button.Text = "Speed: 16"
+    if humanoid then
+        humanoid.WalkSpeed = fast and 100 or 16
+        Button.Text = "Speed: " .. (fast and "100" or "16")
     end
 end)
