@@ -1,25 +1,32 @@
 local screenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 screenGui.Name = "screenGui"
 
--- Water ImageButton (using a free water texture from online)
+-- Water ImageButton
 local btn = Instance.new("ImageButton", screenGui)
 btn.Name = "WaterSpeedBtn"
-btn.Image = "rbxassetid://13129884510" -- Water texture (replace with your preferred image ID)
+btn.Image = "rbxassetid://13129884510" -- Water texture (replace if needed)
 btn.ImageTransparency = 0.3
 btn.Size = UDim2.new(0, 100, 0, 40)
 btn.Position = UDim2.new(0, 30, 0, 30)
-btn.BackgroundColor3 = Color3.fromRGB(0, 100, 255) -- Water blue
+btn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
 btn.BackgroundTransparency = 0.7
-btn.Text = "Speed: 16"
-btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-btn.Font = Enum.Font.GothamBlack
 btn.Active = true
 btn.Draggable = true
+
+-- Add TextLabel inside the ImageButton
+local speedText = Instance.new("TextLabel", btn)
+speedText.Name = "SpeedText"
+speedText.Size = UDim2.new(1, 0, 1, 0) -- Fills entire button
+speedText.BackgroundTransparency = 1 -- Invisible background
+speedText.Text = "Speed: 16"
+speedText.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedText.Font = Enum.Font.GothamBlack
+speedText.TextScaled = true
 
 local uibtn = Instance.new("UICorner", btn)
 uibtn.CornerRadius = UDim.new(0, 10)
 
--- Metatable hook
+-- Rest of the script remains the same
 local gmt = getrawmetatable(game)
 setreadonly(gmt, false)
 
@@ -43,7 +50,7 @@ local fast = false
 local function updateSpeed()
     if humanoid then
         humanoid.WalkSpeed = fast and 100 or 16
-        btn.Text = fast and "Speed: 100" or "Speed: 16"
+        speedText.Text = fast and "Speed: 100" or "Speed: 16" -- Update TextLabel now
     end
 end
 
@@ -66,3 +73,4 @@ btn.MouseButton1Click:Connect(function()
     fast = not fast
     updateSpeed()
 end)
+
